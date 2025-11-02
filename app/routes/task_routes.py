@@ -2,6 +2,7 @@ from flask import Blueprint, request, make_response, Response, abort
 from app.models.task import Task
 from app.db import db
 from sqlalchemy import desc, asc
+from datetime import datetime
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -51,13 +52,31 @@ def update_task(id):
     task = validate_model(Task, id)
     request_body = request.get_json()
 
-    #if not request_body or "title" not in request_body or "description" not in request_body:
-        #return make_response({"details": "Invalid data"}, 400)
-
     task.title = request_body["title"]
     task.description = request_body["description"]
     db.session.commit()
 
+    return Response(status=204, mimetype="application/json")
+
+
+@tasks_bp.patch("/<id>/mark_complete")
+def mark_task_complete(id):
+    task = validate_model(Task, id)
+    
+    now = datetime.now()
+    task.completed_at = now
+    db.session.commit()
+    
+    return Response(status=204, mimetype="application/json")
+
+
+@tasks_bp.patch("/<id>/mark_incomplete")
+def mark_task_incomplete(id):
+    task = validate_model(Task, id)
+
+    task.completed_at = None
+    db.session.commit()
+    
     return Response(status=204, mimetype="application/json")
 
 
