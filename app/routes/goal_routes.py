@@ -1,5 +1,6 @@
 from flask import Blueprint, request, make_response, Response, abort
 from app.models.goal import Goal
+from app.models.task import Task
 from app.db import db
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
@@ -19,6 +20,29 @@ def create_goal():
 
     return new_goal.to_dict(), 201
 
+@goals_bp.post("/<id>/tasks")
+def assign_tasks_to_goal(id):
+    resp_dict = {}
+    goal = validate_model(Goal, id)
+    request_body = request.get_json()
+    
+    if "task_ids" not in request_body:
+        return {"details": "task_ids is required"}, 400
+        
+    task_ids = request_body["task_ids"]
+    tasks = []
+    for task_id in task_ids:
+        task = validate_model(Task, task_id)
+        tasks.append(task)
+    
+    goal.tasks = tasks
+    db.session.commit()
+
+    resp_dict["id"] = goal.id
+    resp_dict["task_ids"] = [task.id for task in goal.tasks]
+
+    return resp_dict, 200
+
 
 @goals_bp.get("")
 def get_all_goals():
@@ -31,6 +55,12 @@ def get_all_goals():
 
 @goals_bp.get("/<id>")
 def get_goal_by_id(id):
+    goal = validate_model(Goal, id)
+
+    return goal.to_dict(), 200
+
+@goals_bp.get("/<id>/tasks")
+def get_goal_tasks(id):
     goal = validate_model(Goal, id)
 
     return goal.to_dict(), 200

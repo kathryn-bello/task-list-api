@@ -9,8 +9,7 @@ from dotenv import load_dotenv
 def create_app(config=None):
     app = Flask(__name__)
 
-    env_path = os.path.join(os.path.dirname(__file__), '.env')
-    load_dotenv(env_path)
+    load_dotenv()
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')

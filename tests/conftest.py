@@ -8,7 +8,7 @@ from app.models.task import Task
 from app.models.goal import Goal
 from datetime import datetime
 
-load_dotenv(os.path.join(os.path.dirname(__file__), '..', 'app', '.env'))
+load_dotenv()
 
 @pytest.fixture
 def app():
