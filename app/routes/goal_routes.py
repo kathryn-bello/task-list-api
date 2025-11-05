@@ -1,6 +1,7 @@
 from flask import Blueprint, request, make_response, Response, abort
 from app.models.goal import Goal
 from app.models.task import Task
+from app.routes.route_utilities import validate_model, create_model
 from app.db import db
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
@@ -9,11 +10,7 @@ goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 @goals_bp.post("")
 def create_goal():
     request_body = request.get_json()
-
-    try:
-        new_goal = Goal.from_dict(request_body)
-    except KeyError:
-        return make_response({"details": "Invalid data"}, 400)
+    new_goal = create_model(request_body)
 
     db.session.add(new_goal)
     db.session.commit()
@@ -85,21 +82,3 @@ def delete_goal_by_id(id):
     db.session.commit()
 
     return Response(status=204, mimetype="application/json")
-
-
-# Route Helper Methods
-def validate_model(cls, model_id):
-    try:
-        model_id = int(model_id)
-    except Exception:
-        response = {"details": f"{cls.__name__} {model_id} invalid"}
-        abort(make_response(response, 400))
-
-    query = db.select(cls).where(cls.id == model_id)
-    model = db.session.scalar(query)
-
-    if not model:
-        response = {"details": f"{cls.__name__} {model_id} not found"}
-        abort(make_response(response, 404))
-
-    return model

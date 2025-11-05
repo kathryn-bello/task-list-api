@@ -3,6 +3,7 @@ from app.models.task import Task
 from app.db import db
 from sqlalchemy import desc, asc
 from datetime import datetime
+from app.routes.route_utilities import validate_model, create_model
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -11,10 +12,7 @@ tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 def create_task():
     request_body = request.get_json()
 
-    try:
-        new_task = Task.from_dict(request_body)
-    except KeyError:
-        return make_response({"details": "Invalid data"}, 400)
+    new_task = create_model(request_body)
 
     db.session.add(new_task)
     db.session.commit()
@@ -88,21 +86,3 @@ def delete_task_by_id(id):
     db.session.commit()
 
     return Response(status=204, mimetype="application/json")
-
-
-# Route Helper Methods
-def validate_model(cls, model_id):
-    try:
-        model_id = int(model_id)
-    except Exception:
-        response = {"details": f"{cls.__name__} {model_id} invalid"}
-        abort(make_response(response, 400))
-
-    query = db.select(cls).where(cls.id == model_id)
-    model = db.session.scalar(query)
-
-    if not model:
-        response = {"details": f"{cls.__name__} {model_id} not found"}
-        abort(make_response(response, 404))
-
-    return model
