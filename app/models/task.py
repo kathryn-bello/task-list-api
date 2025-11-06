@@ -32,9 +32,9 @@ class Task(db.Model):
     def to_dict(self):
         task_as_dict = {}
         task_as_dict["id"] = self.id
-        task_as_dict["goal_id"] = self.goal_id
         task_as_dict["title"] = self.title
         task_as_dict["description"] = self.description
         task_as_dict["is_complete"] = True if self.completed_at else False
-
+        if self.goal_id is not None:
+            task_as_dict["goal_id"] = self.goal_id
         return task_as_dict

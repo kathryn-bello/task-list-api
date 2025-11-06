@@ -11,13 +11,8 @@ tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 @tasks_bp.post("")
 def create_task():
     request_body = request.get_json()
-
-    new_task = create_model(request_body)
-
-    db.session.add(new_task)
-    db.session.commit()
-
-    return new_task.to_dict(), 201
+    
+    return create_model(Task, request_body)
 
 
 @tasks_bp.get("")

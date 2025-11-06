@@ -10,12 +10,8 @@ goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 @goals_bp.post("")
 def create_goal():
     request_body = request.get_json()
-    new_goal = create_model(request_body)
-
-    db.session.add(new_goal)
-    db.session.commit()
-
-    return new_goal.to_dict(), 201
+    
+    return create_model(Goal, request_body)
 
 @goals_bp.post("/<id>/tasks")
 def assign_tasks_to_goal(id):
@@ -60,7 +56,15 @@ def get_goal_by_id(id):
 def get_goal_tasks(id):
     goal = validate_model(Goal, id)
 
-    return goal.to_dict(), 200
+    tasks = [task.to_dict() for task in goal.tasks] if goal.tasks else []
+
+    resp = {
+        "id": goal.id,
+        "title": goal.title,
+        "tasks": tasks
+    }
+
+    return resp, 200
 
 
 @goals_bp.put("/<id>")
