@@ -20,8 +20,8 @@ def validate_model(cls, model_id):
 def create_model(cls, model_data):
     try:
         new_model = cls.from_dict(model_data)
-    except KeyError as error:
-        response = {"details": f"Invalid data"}
+    except Exception as e:
+        response = {"details": f"Invalid request: missing {e.args[0]}"}
         abort(make_response(response, 400))
 
     db.session.add(new_model)

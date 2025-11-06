@@ -250,7 +250,7 @@ def test_create_task_must_contain_title(client):
     assert response.status_code == 400
     assert "details" in response_body
     assert response_body == {
-        "details": "Invalid data"
+        "details": "Invalid request: missing title"
     }
     assert db.session.scalars(db.select(Task)).all() == []
 
@@ -267,6 +267,6 @@ def test_create_task_must_contain_description(client):
     assert response.status_code == 400
     assert "details" in response_body
     assert response_body == {
-        "details": "Invalid data"
+        "details": "Invalid request: missing description"
     }
     assert db.session.scalars(db.select(Task)).all() == []
