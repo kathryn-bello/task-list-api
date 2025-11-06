@@ -1,7 +1,7 @@
-from flask import make_response, Response, abort, current_app
+from flask import make_response, Response, abort
 from app.db import db
 import requests
-import json
+import os
 
 def validate_model(cls, model_id):
     try:
@@ -34,13 +34,18 @@ def create_model(cls, model_data):
 def send_slack_notification(task_title):
     url = "https://slack.com/api/chat.postMessage"
 
+    SLACK_API_TOKEN = os.environ.get("SLACK_API_TOKEN")
+
+    if not SLACK_API_TOKEN:
+        raise ValueError("SLACK_API_TOKEN environment variable not set.")
+
     payload = {
         "channel": "C09QW7ZQ8CX",  
         "text": f"Someone just completed the task {task_title}"
     }
-    slack_token = current_app.config['SLACK_API_TOKEN']
+
     headers = {
-        'Authorization': f'Bearer {slack_token}',
+        'Authorization': f'Bearer {SLACK_API_TOKEN}',
         'Content-Type': 'application/json'
     }
     try:
