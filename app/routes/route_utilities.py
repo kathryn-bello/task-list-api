@@ -33,23 +33,20 @@ def create_model(cls, model_data):
 
 def send_slack_notification(task_title):
     url = "https://slack.com/api/chat.postMessage"
-
-    SLACK_API_TOKEN = os.environ.get("SLACK_API_TOKEN")
-
-    if not SLACK_API_TOKEN:
-        raise ValueError("SLACK_API_TOKEN environment variable not set.")
+    token = os.environ.get("SLACK_API_TOKEN")
 
     payload = {
-        "channel": "C09QW7ZQ8CX",  
+        "channel": "C09QW7ZQ8CX", 
         "text": f"Someone just completed the task {task_title}"
     }
 
     headers = {
-        'Authorization': f'Bearer {SLACK_API_TOKEN}',
+        'Authorization': f'Bearer {token}',
         'Content-Type': 'application/json'
     }
     try:
         response = requests.post(url, headers=headers, json=payload)
+        print(response.json())
         return response.json()
     except Exception as e:
         return {"details": f"Failed to send slack message {e}"}
