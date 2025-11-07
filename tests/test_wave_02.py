@@ -55,3 +55,16 @@ def test_get_tasks_sorted_desc(client, three_tasks):
             "is_complete": False,
             "title": "Answer forgotten email 📧"},
     ]
+
+
+def test_get_tasks_sorted_invalid_param(client, three_tasks):
+    # Act
+    response = client.get("/tasks?sort=descending")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert "details" in response_body
+    assert response_body == {
+        "details": "Invalid request: sort only accepts asc or desc."
+    }

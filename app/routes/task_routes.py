@@ -19,11 +19,14 @@ def create_task():
 def get_all_tasks():
     sort_param = request.args.get("sort")
     query = db.select(Task)
-
-    if sort_param == "asc":
-        query = query.order_by(asc(Task.title))
-    elif sort_param == "desc":
-        query = query.order_by(desc(Task.title))
+    if sort_param:
+        if sort_param == "asc":
+            query = query.order_by(asc(Task.title))
+        elif sort_param == "desc":
+            query = query.order_by(desc(Task.title))
+        elif sort_param != "asc" and sort_param != "desc":
+            response = {"details": "Invalid request: sort only accepts asc or desc."}
+            abort(make_response(response, 400))
     else:
         query = query.order_by(Task.id)
     
